@@ -9,7 +9,6 @@ import guru.springframework.repositories.RecipeRepository;
 import guru.springframework.repositories.UnitOfMeasureRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -55,11 +54,14 @@ public class IngredientServiceImpl implements IngredientService {
             log.error("Ingredient id not found: " + ingredientId);
         }
 
+        //enhance command object with recipe id
+        IngredientCommand ingredientCommand = ingredientCommandOptional.get();
+        ingredientCommand.setRecipeId(recipe.getId());
+
         return ingredientCommandOptional.get();
     }
 
     @Override
-    @Transactional
     public IngredientCommand saveIngredientCommand(IngredientCommand command) {
         Optional<Recipe> recipeOptional = recipeRepository.findById(command.getRecipeId());
 
@@ -108,6 +110,11 @@ public class IngredientServiceImpl implements IngredientService {
             }
 
             //to do check for fail
+
+            //enhance with id value
+            IngredientCommand ingredientCommandSaved = ingredientToIngredientCommand.convert(savedIngredientOptional.get());
+            ingredientCommandSaved.setRecipeId(recipe.getId());
+
             return ingredientToIngredientCommand.convert(savedIngredientOptional.get());
         }
 
