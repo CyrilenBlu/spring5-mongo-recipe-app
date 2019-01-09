@@ -8,44 +8,45 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @DataMongoTest
 @Slf4j
 public class UnitOfMeasureReactiveRepositoryTest {
 
-    UnitOfMeasure uom1 = new UnitOfMeasure();
-    UnitOfMeasure uom2 = new UnitOfMeasure();
-    UnitOfMeasure uom3 = new UnitOfMeasure();
-
     @Autowired
     UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository;
 
     @Before
     public void setUp() throws Exception {
-        uom1.setDescription("tea");
-        uom2.setDescription("bob");
-        uom3.setDescription("awesome");
+        unitOfMeasureReactiveRepository.deleteAll().block();
     }
 
     @Test
-    public void testMono() {
+    public void testSaveUOM() {
+        UnitOfMeasure uom = new UnitOfMeasure();
+        uom.setDescription("pint");
 
+        unitOfMeasureReactiveRepository.save(uom).block();
 
-        Mono<UnitOfMeasure> unitOfMeasureMono = Mono.just(uom1);
+        Long count = unitOfMeasureReactiveRepository.count().block();
 
-        UnitOfMeasure uom = unitOfMeasureMono.block();
-
-        log.info(uom.getDescription());
+        assertEquals(Long.valueOf(1), count);
     }
 
     @Test
-    public void testFlux(){
+    public void testFindByDescription() {
+        UnitOfMeasure uom = new UnitOfMeasure();
+        uom.setDescription("pinch");
 
-        Flux<UnitOfMeasure> unitOfMeasureFlux = Flux.just(uom1, uom2, uom3);
+        unitOfMeasureReactiveRepository.save(uom).then().block();
 
-        unitOfMeasureFlux.subscribe(unitOfMeasure -> log.info(unitOfMeasure.getDescription()));
+        UnitOfMeasure savedUOM = unitOfMeasureReactiveRepository.findByDescription("pinch").block();
+
+        assertNotNull(savedUOM);
+        assertEquals(savedUOM.getDescription(), "pinch");
     }
 }
