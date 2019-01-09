@@ -1,7 +1,6 @@
 package guru.springframework.repositories.reactive;
 
 import guru.springframework.domain.UnitOfMeasure;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @DataMongoTest
-@Slf4j
 public class UnitOfMeasureReactiveRepositoryTest {
 
     @Autowired
